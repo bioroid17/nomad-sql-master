@@ -1,6 +1,7 @@
 DROP TABLE movies;
 
 CREATE TABLE movies (
+	movie_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT UNIQUE NOT NULL,
 	released INTEGER NOT NULL CHECK (released > 0), -- 1, 2, 3, ...
 	overview TEXT NOT NULL CHECK (LENGTH(overview) <= 100),
@@ -11,7 +12,7 @@ CREATE TABLE movies (
 ) STRICT;
 
 INSERT INTO
-  movies (title, rating, released, overview, for_kids)
+  movies (title, rating, released, overview)
 VALUES
-  ('The Lord Of The Rings', 0.5, 1, 'Rings and hobbits qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm qazwsxedc rfv tgb', 0),
-  ('Dune: Part One', 10, 1, 'Sand', 1);
+  ('The Lord Of The Rings', 0.5, 1, 'Rings and hobbits'),
+  ('Dune: Part One', 10, 1, 'Sand');
