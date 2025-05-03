@@ -1,1 +1,1 @@
-SELECT 1+1, 2+2, UPPER('hello');
+SELECT title, rating FROM movies;
