@@ -1,6 +1,10 @@
 SELECT
-    REPLACE(title, ': Part One', 'I') AS title,
-    rating * 2 AS double_rating,
-    UPPER(overview) AS overview_uppercase
+  *
 FROM
-    movies;
+  movies
+WHERE
+  rating > 9
+  OR (
+    rating IS NULL
+    AND genres = 'Documentary'
+  );
