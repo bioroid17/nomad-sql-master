@@ -2,8 +2,7 @@ SELECT		-- 3
   *
 FROM		-- 1
   movies
--- WHERE		-- 2
---   director = 'Darren Aronofsky'
-ORDER BY	-- 4
-	release_date DESC,
-	revenue DESC;
+-- WHERE 	-- 2
+-- ORDER BY	-- 4
+LIMIT 5		-- 6
+OFFSET 10;	-- 5
