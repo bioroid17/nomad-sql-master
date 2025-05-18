@@ -1,9 +1,9 @@
-SELECT
-  title,
-  CASE
-    WHEN rating >= 8 THEN '👍'
-    WHEN rating <= 6 THEN '👎'
-    ELSE '👀'
-  END AS good_or_not
-FROM
-  movies;
+SELECT		-- 3
+  *
+FROM		-- 1
+  movies
+-- WHERE		-- 2
+--   director = 'Darren Aronofsky'
+ORDER BY	-- 4
+	release_date DESC,
+	revenue DESC;
