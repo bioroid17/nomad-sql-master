@@ -1,133 +1,82 @@
--- 1. 각 년도에 개봉된 영화의 수
+-- 1. 영화의 최고 평점과 최저 평점 차이가 가장 큰 상위 5개 연도
 SELECT
   release_date,
-  COUNT(*) total_movies
+  MAX(rating) - MIN(rating) AS diff
 FROM
   movies
 WHERE
   release_date IS NOT NULL
+  AND rating IS NOT NULL
 GROUP BY
   release_date
 ORDER BY
-  total_movies DESC;
+  diff DESC,
+  release_date DESC
+LIMIT
+  5;
 
--- 2. 평균 영화 상영 시간이 가장 높은 최신 10년
+
+-- 2. 2시간 미만의 영화를 만들어 본 적이 한 번도 없는 감독
 SELECT
-  release_date,
-  ROUND(AVG(runtime), 2) avg_runtime
+  director
 FROM
   movies
 WHERE
   runtime IS NOT NULL
+  AND director IS NOT NULL
 GROUP BY
-  release_date
-ORDER BY
-  avg_runtime DESC
-LIMIT
-  10;
+  director
+HAVING
+  MIN(runtime) >= 120;
 
--- 3. 21세기에 개봉한 영화의 평균 평점
+-- 3. 전체 영화에서 평점이 8.0보다 높은 영화의 비율
 SELECT
-  ROUND(AVG(rating), 2) avg_rating
+  CONCAT(ROUND(100.0 * SUM(rating > 8) / COUNT(*), 2), '%') AS percentage
 FROM
-  movies
-WHERE
-  release_date >= 2000;
+  movies;
 
--- 4. 평균 영화 상영 시간이 가장 긴 감독
+-- 4. 평점이 7.0보다 높은 영화가 차지하는 비율이 가장 높은 감독
 SELECT
   director,
-  ROUND(AVG(runtime), 2) avg_runtime
+  ROUND(1.0 * SUM(rating > 7) / COUNT(*), 2) AS ratio
 FROM
   movies
 WHERE
   director IS NOT NULL
-  AND runtime IS NOT NULL
 GROUP BY
   director
 HAVING
-  COUNT(*) >= 3
+  COUNT(*) >= 5
 ORDER BY
-  avg_runtime DESC;
+  ratio DESC
+LIMIT
+  1;
 
--- 5. 가장 많은 영화를 작업한 다작 감독 상위 5명
+-- 5. 길이별로 영화를 분류하고 그룹화하기
 SELECT
-  director,
+  CASE
+    WHEN runtime < 90 THEN 'Short'
+    WHEN runtime > 120 THEN 'Long'
+    ELSE 'Medium'
+  END AS runtime_category,
+  COUNT(*) AS total_movies
+FROM
+  movies
+GROUP BY
+  runtime_category;
+
+
+-- 6. flop 여부에 따라 영화를 분류 및 그룹화하기
+-- flop이란, 수익보다 예산이 더 많이 나가는 영화를 의미한다.
+SELECT
+  CASE
+    WHEN budget > revenue THEN 'Flop'
+    ELSE 'Success'
+  END AS flop_or_success,
   COUNT(*) total_movies
 FROM
   movies
 WHERE
-  director IS NOT NULL
-  AND runtime > 45
-GROUP BY
-  director
-ORDER BY
-  total_movies DESC
-LIMIT
-  5;
-  
--- 6. 각 감독의 최고 평점과 최저 평점
-SELECT
-  director,
-  MIN(rating) min_rating,
-  MAX(rating) max_rating
-FROM
-  movies
-WHERE
-  rating IS NOT NULL
-  AND director IS NOT NULL
-GROUP BY
-  director
-HAVING
-	COUNT(*) > 5;
-
--- 7. 돈을 가장 많이 번 감독 (수익에서 예산을 뺀 금액 계산)
-SELECT
-  director,
-  SUM(revenue) - SUM(budget) AS profit
-FROM
-  movies
-WHERE
-  revenue IS NOT NULL
-  AND budget IS NOT NULL
-  AND director IS NOT NULL
-GROUP BY
-  director
-ORDER BY
-  profit DESC;
-
--- 8. 2시간 이상인 영화들의 평균 평점
-SELECT
-  ROUND(AVG(rating), 2) AS avg_rating
-FROM
-  movies
-WHERE
-  runtime >= 120
-  AND rating IS NOT NULL;
-  
--- 9. 가장 많은 영화가 개봉된 년도
-SELECT
-  release_date,
-  COUNT(*) AS total_movies
-FROM
-  movies
-WHERE
-  release_date IS NOT NULL
-GROUP BY
-  release_date
-ORDER BY
-  total_movies DESC
-LIMIT
-  1;
-
--- 10. 각 10년동안 평균 영화 상영 시간 (ex: 1800, 1900, 2000)
-SELECT
-  CONCAT((release_date / 10) * 10, 's') AS decade,
-  ROUND(AVG(runtime), 2) AS avg_runtime
-FROM
-  movies
-WHERE
-  release_date IS NOT NULL
-  AND runtime IS NOT NULL
-GROUP BY
-  decade;
+  budget IS NOT NULL
+  AND revenue IS NOT NULL
+GROUP BY flop_or_success;
