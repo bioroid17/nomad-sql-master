@@ -1,5 +1,6 @@
 -- view 생성
-CREATE VIEW v_guy_ritchie_awesome AS SELECT
+CREATE VIEW v_guy_ritchie_awesome AS
+SELECT
   *
 FROM
   movies
