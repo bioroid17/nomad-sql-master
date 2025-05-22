@@ -1,26 +1,26 @@
--- 전체 영화 중 평점이나 수익이 평균 평점 또는 수익보다 높은 영화들의 제목, 감독, 수익 목록
-WITH
-  avg_revenue_cte AS (
-    SELECT
-      AVG(revenue) AS avg_revenue
-    FROM
-      movies
-  ),
-  avg_rating_cte AS (
-    SELECT
-      AVG(rating) AS avg_rating
-    FROM
-      movies
-  )
+-- 같은 해에 상영된 영화들의 평균 평점보다 높은 평점을 기록한 영화들의 목록
 SELECT
-  title,
-  director,
-  revenue,
-  ROUND( ( SELECT avg_revenue FROM avg_revenue_cte ), 0 ) AS avg_revenue,
-  rating,
-  ROUND( ( SELECT avg_rating FROM avg_rating_cte ), 0 ) AS avg_rating
+  main_movies.title,
+  main_movies.director,
+  main_movies.rating,
+  main_movies.release_date,
+  (
+    SELECT
+      AVG(inner_movies.rating)
+    FROM
+      movies AS inner_movies
+    WHERE
+      inner_movies.release_date = main_movies.release_date
+  ) AS year_average
 FROM
-  movies
+  movies AS main_movies
 WHERE
-  revenue > ( SELECT * FROM avg_revenue_cte )
-  AND rating > ( SELECT * FROM avg_rating_cte );
+  main_movies.rating > (
+    SELECT
+      AVG(inner_movies.rating)
+    FROM
+      movies AS inner_movies
+    WHERE
+      inner_movies.release_date = main_movies.release_date
+  );
+--   AND release_date > 2020;
