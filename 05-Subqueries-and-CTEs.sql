@@ -1,78 +1,87 @@
--- 자신의 평점이 자신이 속한 장르 평균 평점보다 높은 영화들의 목록
 WITH
-  avg_genre_rating_cte AS (
-    SELECT
-      AVG(sub_movies.rating)
-    FROM
-      movies AS sub_movies
-    WHERE
-      sub_movies.genres IS NOT NULL
-      AND sub_movies.genres = main_movies.genres
-    GROUP BY
-      sub_movies.genres
-  )
-SELECT
-  main_movies.title,
-  main_movies.genres,
-  main_movies.rating,
-  (
-    SELECT
-      *
-    FROM
-      avg_genre_rating_cte
-  ) as avg_rating
-FROM
-  movies AS main_movies
-WHERE
-  main_movies.rating > (
-    SELECT
-      *
-    FROM
-      avg_genre_rating_cte
-  )
-  AND main_movies.release_date > 2020;
-
-
--- 모든 감독들의 평균 수익보다 높은 커리어 수익을 기록한 감독들의 목록
-WITH
-  directors_revenues AS (
+  director_stats AS (
     SELECT
       director,
-      SUM(revenue) AS career_revenue
+      COUNT(*) AS total_movies,
+      AVG(rating) AS avg_rating,
+      MAX(rating) AS best_rating,
+      MIN(rating) AS worst_rating,
+      MAX(budget) AS highest_budget,
+      MIN(budget) AS lowest_budget
     FROM
       movies
     WHERE
       director IS NOT NULL
-      AND revenue IS NOT NULL
+      AND budget IS NOT NULL
+      AND rating IS NOT NULL
     GROUP BY
       director
-  ),
-  avg_director_career_revenue AS (
-    SELECT
-      AVG(career_revenue)
-    FROM
-      directors_revenues
   )
 SELECT
   director,
-  SUM(revenue) AS total_revenue,
+  total_movies,
+  avg_rating,
+  best_rating,
+  worst_rating,
+  highest_budget,
+  lowest_budget,
   (
     SELECT
-      *
+      title
     FROM
-      avg_director_career_revenue
-  ) AS peers_avg
-FROM
-  movies
-WHERE
-  director IS NOT NULL
-  AND revenue IS NOT NULL
-GROUP BY
-  director
-HAVING
-  total_revenue > (
+      movies
+    WHERE
+      director = ds.director
+      AND budget IS NOT NULL
+      AND rating IS NOT NULL
+    ORDER BY
+      rating DESC
+    LIMIT
+      1
+  ) AS best_rated_movie,
+  (
     SELECT
-      *
+      title
     FROM
-      avg_director_career_revenue
-  );
+      movies
+    WHERE
+      director = ds.director
+      AND budget IS NOT NULL
+      AND rating IS NOT NULL
+    ORDER BY
+      rating ASC
+    LIMIT
+      1
+  ) AS worst_rated_movie,
+  (
+    SELECT
+      title
+    FROM
+      movies
+    WHERE
+      director = ds.director
+      AND budget IS NOT NULL
+      AND rating IS NOT NULL
+    ORDER BY
+      budget DESC
+    LIMIT
+      1
+  ) AS most_expensive_movie,
+  (
+    SELECT
+      title
+    FROM
+      movies
+    WHERE
+      director = ds.director
+      AND budget IS NOT NULL
+      AND rating IS NOT NULL
+    ORDER BY
+      budget ASC
+    LIMIT
+      1
+  ) AS least_expensive_movie
+FROM
+  director_stats AS ds;
+
+CREATE INDEX idx_director ON movies(director);
