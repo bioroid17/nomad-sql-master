@@ -84,4 +84,4 @@ SELECT
 FROM
   director_stats AS ds;
 
-CREATE INDEX idx_director ON movies(director);
+CREATE INDEX idx_director ON movies (director);
