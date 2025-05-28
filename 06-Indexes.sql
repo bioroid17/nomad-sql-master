@@ -1,28 +1,11 @@
 SELECT
-  title,
-  movie_id,
-  rowid
+  title
 FROM
   movies
 WHERE
-  director = 'Guy Ritchie';
+  release_date = 2020
+  AND rating > 7;
 
-CREATE INDEX idx_director ON movies (director);
+CREATE INDEX idx ON movies (release_date, rating);
 
-DROP INDEX idx_director;
-
-
-CREATE TABLE X (name TEXT);
-
-INSERT INTO X VALUES ('hello');
-
-SELECT name, rowid FROM X;
-
-SELECT * FROM X;
-
-SELECT *, rowid FROM X;
-
-
-CREATE TABLE Z (name UNIQUE);
-
-INSERT INTO Z VALUES ('hello');
+DROP INDEX idx;
