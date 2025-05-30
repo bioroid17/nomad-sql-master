@@ -54,4 +54,29 @@ CREATE TABLE users (
   CONSTRAINT uq_email UNIQUE (email)
 );
 
-DROP TABLE users;
+INSERT INTO
+  users (
+    username,
+    email,
+    gender,
+    interests,
+    bio,
+    age,
+    is_admin,
+    birth_date,
+    bed_time,
+    graduation_year
+  )
+VALUES
+  (
+    'mr.nobody',
+    'mr@nobody.com',
+    'Male',
+    'Travel,Food,Technology',
+    'I like traveling and eating',
+    26,
+    TRUE,
+    '1999-05-08', -- 19990508 1999.05.08 1999/05/08
+    '22:30:00', -- 223000 22:30 22
+    '2016'
+  );
