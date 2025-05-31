@@ -1,11 +1,11 @@
-ALTER TABLE users MODIFY COLUMN graduation_year DATE;
+CREATE TABLE users_v2 (
+  user_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  email VARCHAR(100),
+  full_name VARCHAR(101) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) STORED
+);
 
-ALTER TABLE users ADD COLUMN graduation_date DATE;
+ALTER TABLE users_v2 ADD COLUMN email_domain VARCHAR(50) GENERATED ALWAYS AS (SUBSTRING_INDEX(email, '@', -1)) VIRTUAL;
 
-UPDATE users SET graduation_date = MAKEDATE(graduation_year, 1);
-
-ALTER TABLE users DROP COLUMN graduation_year;
-
-ALTER TABLE users MODIFY COLUMN graduation_date DATE NOT NULL;
-
--- ALTER TABLE users ADD COLUMN graduation_date DATE NOT NULL DEFAULT MAKEDATE(graduation_year, 1); -- DEFAULT 값이 상수가 아니므로 에러가 난다.
+SELECT * FROM users_v2;
