@@ -1,11 +1,28 @@
-CREATE TABLE users_v2 (
-  user_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  first_name VARCHAR(50),
-  last_name VARCHAR(50),
-  email VARCHAR(100),
-  full_name VARCHAR(101) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) STORED
+CREATE TABLE movies (
+  movie_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(300) NOT NULL,
+  original_title VARCHAR(300) NOT NULL,
+  original_language CHAR(2) NOT NULL,
+  overview TEXT,
+  release_date SMALLINT UNSIGNED,
+  revenue BIGINT UNSIGNED,
+  budget BIGINT UNSIGNED,
+  homepage TEXT,
+  runtime SMALLINT UNSIGNED,
+  rating FLOAT,
+  status ENUM(
+    'Released',
+    'Rumored',
+    'Post Production',
+    'Canceled',
+    'Planned',
+    'In Production'
+  ) NOT NULL,
+  country TINYTEXT,
+  genres TINYTEXT,
+  director TINYTEXT,
+  spoken_languages TINYTEXT,
+  CONSTRAINT chk_rating CHECK (rating BETWEEN 0.0 AND 10.0)
 );
 
-ALTER TABLE users_v2 ADD COLUMN email_domain VARCHAR(50) GENERATED ALWAYS AS (SUBSTRING_INDEX(email, '@', -1)) VIRTUAL;
-
-SELECT * FROM users_v2;
+SELECT * FROM movies;
