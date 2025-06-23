@@ -10,7 +10,7 @@ CREATE TABLE movies (
   homepage TEXT,
   runtime SMALLINT UNSIGNED,
   rating FLOAT,
-  status ENUM(
+  status ENUM (
     'Released',
     'Rumored',
     'Post Production',
@@ -25,4 +25,7 @@ CREATE TABLE movies (
   CONSTRAINT chk_rating CHECK (rating BETWEEN 0.0 AND 10.0)
 );
 
-SELECT * FROM movies;
+SELECT
+  *
+FROM
+  movies;
