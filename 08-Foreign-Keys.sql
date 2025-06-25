@@ -6,11 +6,16 @@ CREATE TABLE dogs (
   weight DECIMAL(5, 2),
   date_of_birth DATE,
   owner_id BIGINT UNSIGNED,
-  breed_id BIGINT UNSIGNED,
+  breed_id BIGINT UNSIGNED DEFAULT 2,
   
-  FOREIGN KEY (owner_id) REFERENCES owners (owner_id),
-  CONSTRAINT breed_fk FOREIGN KEY (breed_id) REFERENCES breeds (breed_id)
+  FOREIGN KEY (owner_id) REFERENCES owners (owner_id) ON DELETE SET NULL,
+  CONSTRAINT breed_fk FOREIGN KEY (breed_id) REFERENCES breeds (breed_id) ON DELETE SET DEFAULT
 );
+
+-- ALTER TABLE dogs
+-- DROP FOREIGN KEY owner_fk;
+-- ALTER TABLE dogs
+-- ADD CONSTRAINT owner_fk FOREIGN KEY (owner_id) REFERENCES owners (owner_id) ON DELETE SET NULL;
 
 CREATE TABLE breeds (
   breed_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -26,6 +31,8 @@ CREATE TABLE owners (
   phone VARCHAR(20),
   address TINYTEXT
 );
+
+DELETE FROM owners WHERE owner_id=1;
 
 INSERT INTO
   breeds (name, size_category, typical_lifespan)
