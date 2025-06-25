@@ -12,11 +12,6 @@ CREATE TABLE dogs (
   CONSTRAINT breed_fk FOREIGN KEY (breed_id) REFERENCES breeds (breed_id) ON DELETE SET DEFAULT
 );
 
--- ALTER TABLE dogs
--- DROP FOREIGN KEY owner_fk;
--- ALTER TABLE dogs
--- ADD CONSTRAINT owner_fk FOREIGN KEY (owner_id) REFERENCES owners (owner_id) ON DELETE SET NULL;
-
 CREATE TABLE breeds (
   breed_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
@@ -32,7 +27,14 @@ CREATE TABLE owners (
   address TINYTEXT
 );
 
-DELETE FROM owners WHERE owner_id=1;
+CREATE TABLE pet_passports (
+  pet_passport_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  blood_type VARCHAR(10),
+  allergies TEXT,
+  last_checkup_date DATE,
+  dog_id BIGINT UNSIGNED UNIQUE,
+  FOREIGN KEY (dog_id) REFERENCES dogs (dog_id) ON DELETE CASCADE
+)
 
 INSERT INTO
   breeds (name, size_category, typical_lifespan)
