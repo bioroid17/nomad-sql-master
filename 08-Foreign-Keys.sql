@@ -7,7 +7,6 @@ CREATE TABLE dogs (
   date_of_birth DATE,
   owner_id BIGINT UNSIGNED,
   breed_id BIGINT UNSIGNED DEFAULT 2,
-  
   FOREIGN KEY (owner_id) REFERENCES owners (owner_id) ON DELETE SET NULL,
   CONSTRAINT breed_fk FOREIGN KEY (breed_id) REFERENCES breeds (breed_id) ON DELETE SET DEFAULT
 );
@@ -15,7 +14,7 @@ CREATE TABLE dogs (
 CREATE TABLE breeds (
   breed_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
-  size_category ENUM('small', 'medium', 'big') DEFAULT 'small',
+  size_category ENUM ('small', 'medium', 'big') DEFAULT 'small',
   typical_lifespan TINYINT
 );
 
@@ -39,13 +38,13 @@ CREATE TABLE pet_passports (
 CREATE TABLE tricks (
   trick_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(50) UNIQUE NOT NULL,
-  difficulty ENUM('easy', 'medium', 'hard') NOT NULL DEFAULT 'easy'
+  difficulty ENUM ('easy', 'medium', 'hard') NOT NULL DEFAULT 'easy'
 );
 
 CREATE TABLE dog_tricks (
   dog_id BIGINT UNSIGNED,
   trick_id BIGINT UNSIGNED,
-  proficiency ENUM('beginner', 'intermediate', 'expert') NOT NULL DEFAULT 'beginner',
+  proficiency ENUM ('beginner', 'intermediate', 'expert') NOT NULL DEFAULT 'beginner',
   date_learned TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (dog_id, trick_id),
   FOREIGN KEY (dog_id) REFERENCES dogs (dog_id) ON DELETE CASCADE,
