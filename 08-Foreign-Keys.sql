@@ -34,29 +34,22 @@ CREATE TABLE pet_passports (
   last_checkup_date DATE,
   dog_id BIGINT UNSIGNED UNIQUE,
   FOREIGN KEY (dog_id) REFERENCES dogs (dog_id) ON DELETE CASCADE
-)
+);
 
-INSERT INTO
-  breeds (name, size_category, typical_lifespan)
-VALUES
-  ('Golden Retriever', 'big', 12);
+CREATE TABLE tricks (
+  trick_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) UNIQUE NOT NULL,
+  difficulty ENUM('easy', 'medium', 'hard') NOT NULL DEFAULT 'easy'
+);
 
-INSERT INTO
-  owners (name, email, phone, address)
-VALUES
-  (
-    'Adam Smith',
-    'adam@smith.com',
-    '1122334455',
-    '9010 St. Scotland'
-  );
+CREATE TABLE dog_tricks (
+  dog_id BIGINT UNSIGNED,
+  trick_id BIGINT UNSIGNED,
+  proficiency ENUM('beginner', 'intermediate', 'expert') NOT NULL DEFAULT 'beginner',
+  date_learned TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (dog_id, trick_id),
+  FOREIGN KEY (dog_id) REFERENCES dogs (dog_id) ON DELETE CASCADE,
+  FOREIGN KEY (trick_id) REFERENCES tricks (trick_id) ON DELETE CASCADE
+);
 
-INSERT INTO
-  dogs (name, date_of_birth, weight, breed_id, owner_id)
-VALUES
-  ('Buddy', '2018-03-15', 10.5, 1, 1);
-
-INSERT INTO
-  dogs (name, date_of_birth, weight, breed_id, owner_id)
-VALUES
-  ('Champ', '2018-03-15', 10.5, 1, 1);
+-- INSERT INTO TABLE dog_tricks (dog_id, trick_id) VALUES (1, 1);
