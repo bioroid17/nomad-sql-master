@@ -1,61 +1,58 @@
--- 1. Show all breeds and the count of dogs for each breed
+-- 1. Show all breeds with their average dog weight and typical lifespan
 SELECT
-  breeds.name AS breed_name,
-  COUNT(*) AS dog_count
+  breeds.name breed_name,
+  AVG(dogs.weight) avg_weight,
+  breeds.typical_lifespan
 FROM
   breeds
-  RIGHT JOIN dogs USING (breed_id)
+  JOIN dogs USING (breed_id)
 GROUP BY
-  breed_name;
-
--- 2. Display all owners with the count of their dogs, the average dog weight and the average dog age.
+  breeds.breed_id;
+  
+-- 2. Display all dogs with their latest checkup date and the time since their last checkup
 SELECT
-  owners.name AS owner_name,
-  COUNT(dogs.dog_id) AS dog_count,
-  AVG(dogs.weight) AS avg_weight,
-  AVG(
-    TIMESTAMPDIFF(YEAR, dogs.date_of_birth, CURRENT_DATE)
-  ) AS avg_age
+  d.name as dog_name,
+  pp.last_checkup_date,
+  TIMESTAMPDIFF(DAY, pp.last_checkup_date, CURDATE()) days_since_last_checkup
 FROM
-  owners
-  LEFT JOIN dogs USING (owner_id)
-GROUP BY
-  owners.owner_id;
+  dogs d
+  JOIN pet_passports pp USING (dog_id);
 
--- 3. Show all tricks and the number of dogs that know each trick ordered by popularity
+-- 3. Display all breeds with the name of the heaviest dog of that breed
 SELECT
-  t.name AS trick_name,
-  COUNT(dt.dog_id) AS total_dogs
+  breeds.name,
+  dogs.name dogs_name,
+  dogs.weight
 FROM
-  tricks AS t
-  LEFT JOIN dog_tricks AS dt USING (trick_id)
-GROUP BY
-  t.trick_id
-ORDER BY
-  total_dogs DESC;
+  dogs
+  JOIN breeds USING (breed_id)
+WHERE
+  dogs.weight = (
+    SELECT
+      MAX(d1.weight)
+    FROM
+      dogs d1
+    WHERE
+      d1.breed_id = breeds.breed_id
+  );
 
--- 4. Display all dogs along with the count of tricks they know
+-- 4. List all tricks with the name of the dog who learned it most recently
 SELECT
-  d.name AS dog_name,
-  COUNT(dt.trick_id) AS total_tricks
-FROM
-  dogs AS d
-  LEFT JOIN dog_tricks AS dt USING (dog_id)
-GROUP BY
-  d.dog_id
-ORDER BY
-  total_tricks DESC;
-
--- 5. List all owner with their dogs and the tricks their dogs know
-SELECT
-  o.name owner_name,
+  t.name trick_name,
   d.name dog_name,
-  dt.proficiency,
-  t.name trick_name
+  dt.date_learned
 FROM
-  owners o
-  LEFT JOIN dogs d USING (owner_id)
-  LEFT JOIN dog_tricks dt USING (dog_id)
-  JOIN tricks t USING (trick_id)
-ORDER BY
-  o.name;
+  tricks t
+  LEFT JOIN dog_tricks dt USING (trick_id)
+  JOIN dogs d USING (dog_id)
+WHERE
+  dt.date_learned = (
+    SELECT
+      MAX(dog_tricks.date_learned)
+    FROM
+      dog_tricks
+    WHERE
+      dog_tricks.trick_id = dt.trick_id
+    GROUP BY
+      trick_id
+  );
