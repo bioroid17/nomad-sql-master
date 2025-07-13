@@ -8,12 +8,12 @@ FROM
   JOIN dogs USING (breed_id)
 GROUP BY
   breeds.breed_id;
-  
+
 -- 2. Display all dogs with their latest checkup date and the time since their last checkup
 SELECT
-  d.name as dog_name,
+  d.name AS dog_name,
   pp.last_checkup_date,
-  TIMESTAMPDIFF(DAY, pp.last_checkup_date, CURDATE()) days_since_last_checkup
+  TIMESTAMPDIFF (DAY, pp.last_checkup_date, CURDATE ()) days_since_last_checkup
 FROM
   dogs d
   JOIN pet_passports pp USING (dog_id);
