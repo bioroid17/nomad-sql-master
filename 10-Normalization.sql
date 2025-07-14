@@ -1,41 +1,39 @@
-CREATE TABLE statuses (
-  status_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
-  status_name ENUM(
-    'Released',
-    'Rumored',
-    'Post Production',
-    'Canceled',
-    'Planned',
-    'In Production'
-  ) NOT NULL,
-  explanation TEXT,
+CREATE TABLE directors (
+  director_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
+  name VARCHAR(120),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 );
 
 INSERT INTO
-  statuses (status_name)
-SELECT DISTINCT
-  status
+  directors (name)
+SELECT
+  director
 FROM
-  movies;
+  movies
+GROUP BY
+  director
+HAVING
+  director <> '';
 
 ALTER TABLE movies
-ADD COLUMN status_id BIGINT UNSIGNED;
+ADD COLUMN director_id BIGINT UNSIGNED;
 
 ALTER TABLE movies
-ADD CONSTRAINT fk_status FOREIGN KEY (status_id) REFERENCES statuses (status_id) ON DELETE SET NULL;
+ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors (director_id) ON DELETE SET NULL;
+
+CREATE INDEX idx_director_name ON directors (name);
 
 UPDATE movies
 SET
-  status_id = (
+  director_id = (
     SELECT
-      status_id
+      director_id
     FROM
-      statuses
+      directors
     WHERE
-      status_name = movies.status
+      name = movies.director
   );
 
 ALTER TABLE movies
-DROP COLUMN status;
+DROP COLUMN director;
