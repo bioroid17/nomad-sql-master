@@ -17,11 +17,18 @@ WHERE
 GROUP BY
   country;
 
--- INSERT INTO
---   countries (country_code)
+INSERT IGNORE INTO
+  countries (country_code)
 SELECT
-  country,
-  SUBSTRING_INDEX(country, ',', 1),
+  SUBSTRING_INDEX(country, ',', 1)
+FROM
+  movies
+WHERE
+  country LIKE '__,__'
+GROUP BY
+  country
+UNION
+SELECT
   SUBSTRING_INDEX(country, ',', -1)
 FROM
   movies
