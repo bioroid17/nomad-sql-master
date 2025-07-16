@@ -1,39 +1,38 @@
-CREATE TABLE directors (
-  director_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
+CREATE TABLE langs (
+  lang_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
   name VARCHAR(120),
+  code CHAR(2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 );
 
 INSERT INTO
-  directors (name)
+  langs (code)
 SELECT
-  director
+  original_language
 FROM
   movies
 GROUP BY
-  director
-HAVING
-  director <> '';
+  original_language;
 
 ALTER TABLE movies
-ADD COLUMN director_id BIGINT UNSIGNED;
+ADD COLUMN original_lang_id BIGINT UNSIGNED;
 
 ALTER TABLE movies
-ADD CONSTRAINT fk_director FOREIGN KEY (director_id) REFERENCES directors (director_id) ON DELETE SET NULL;
+ADD CONSTRAINT fk_org_lang FOREIGN KEY (original_lang_id) REFERENCES langs (lang_id) ON DELETE SET NULL;
 
 CREATE INDEX idx_director_name ON directors (name);
 
 UPDATE movies
 SET
-  director_id = (
+  original_lang_id = (
     SELECT
-      director_id
+      lang_id
     FROM
-      directors
+      langs
     WHERE
-      name = movies.director
+      code = movies.original_language
   );
 
 ALTER TABLE movies
-DROP COLUMN director;
+DROP COLUMN original_language;
