@@ -1,38 +1,31 @@
-CREATE TABLE langs (
-  lang_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
-  name VARCHAR(120),
-  code CHAR(2),
+DROP TABLE countries;
+CREATE TABLE countries (
+  country_id BIGINT UNSIGNED PRIMARY KEY auto_increment,
+  country_code CHAR(2) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 );
 
 INSERT INTO
-  langs (code)
+  countries (country_code)
 SELECT
-  original_language
+  country
 FROM
   movies
+WHERE
+  country NOT LIKE '%,%'
 GROUP BY
-  original_language;
+  country;
 
-ALTER TABLE movies
-ADD COLUMN original_lang_id BIGINT UNSIGNED;
-
-ALTER TABLE movies
-ADD CONSTRAINT fk_org_lang FOREIGN KEY (original_lang_id) REFERENCES langs (lang_id) ON DELETE SET NULL;
-
-CREATE INDEX idx_director_name ON directors (name);
-
-UPDATE movies
-SET
-  original_lang_id = (
-    SELECT
-      lang_id
-    FROM
-      langs
-    WHERE
-      code = movies.original_language
-  );
-
-ALTER TABLE movies
-DROP COLUMN original_language;
+-- INSERT INTO
+--   countries (country_code)
+SELECT
+  country,
+  SUBSTRING_INDEX(country, ',', 1),
+  SUBSTRING_INDEX(country, ',', -1)
+FROM
+  movies
+WHERE
+  country LIKE '__,__'
+GROUP BY
+  country;
