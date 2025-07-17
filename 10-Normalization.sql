@@ -16,10 +16,9 @@ WHERE
 GROUP BY
   country;
 
-INSERT IGNORE INTO
-  countries (country_code)
+INSERT IGNORE INTO countries (country_code)
 SELECT
-  SUBSTRING_INDEX(country, ',', 1)
+  SUBSTRING_INDEX (country, ',', 1)
 FROM
   movies
 WHERE
@@ -28,7 +27,7 @@ GROUP BY
   country
 UNION
 SELECT
-  SUBSTRING_INDEX(country, ',', -1)
+  SUBSTRING_INDEX (country, ',', -1)
 FROM
   movies
 WHERE
@@ -36,10 +35,9 @@ WHERE
 GROUP BY
   country;
 
-INSERT IGNORE INTO
-  countries (country_code)
+INSERT IGNORE INTO countries (country_code)
 SELECT
-  SUBSTRING_INDEX(country, ',', 1)
+  SUBSTRING_INDEX (country, ',', 1)
 FROM
   movies
 WHERE
@@ -48,7 +46,7 @@ GROUP BY
   country
 UNION
 SELECT
-  SUBSTRING_INDEX(country, ',', -1)
+  SUBSTRING_INDEX (country, ',', -1)
 FROM
   movies
 WHERE
@@ -57,7 +55,7 @@ GROUP BY
   country
 UNION
 SELECT
-  SUBSTRING_INDEX(SUBSTRING_INDEX(country, ',', 2), ',', -1)
+  SUBSTRING_INDEX (SUBSTRING_INDEX (country, ',', 2), ',', -1)
 FROM
   movies
 WHERE
@@ -82,7 +80,7 @@ SELECT
   countries.country_id
 FROM
   movies
-  JOIN countries ON movies.country LIKE CONCAT('%', countries.country_code, '%')
+  JOIN countries ON movies.country LIKE CONCAT ('%', countries.country_code, '%')
 WHERE
   movies.country <> ''
   AND countries.country_code <> '';
