@@ -1,11 +1,8 @@
-CREATE TABLE archived_movies LIKE movies;
+SHOW events;
 
-DROP EVENT archive_old_movies;
+SHOW CREATE EVENT archive_old_movies;
 
-TRUNCATE TABLE archived_movies;
-
-DELIMITER $$
-CREATE EVENT archive_old_movies ON SCHEDULE EVERY 2 MINUTE STARTS CURRENT_TIMESTAMP + INTERVAL 2 MINUTE DO BEGIN
+CREATE DEFINER = `root` @`localhost` EVENT `archive_old_movies` ON SCHEDULE EVERY 2 MINUTE STARTS '2025-07-18 00:58:34' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
 INSERT INTO
   archived_movies
 SELECT
@@ -19,5 +16,4 @@ DELETE FROM movies
 WHERE
   release_date < YEAR(CURDATE()) - 20;
 
-END $$
-DELIMITER;
+END
