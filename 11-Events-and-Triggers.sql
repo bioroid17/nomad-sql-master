@@ -1,19 +1,61 @@
-SHOW events;
+-- BEFORE: INSERT, UPDATE, DELETE
+-- AFTER: INSERT, UPDATE, DELETE
+CREATE TABLE records (
+  record_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  changes TINYTEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 
-SHOW CREATE EVENT archive_old_movies;
+DROP TRIGGER before_movie_insert;
 
-CREATE DEFINER = `root` @`localhost` EVENT `archive_old_movies` ON SCHEDULE EVERY 2 MINUTE STARTS '2025-07-18 00:58:34' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+CREATE TRIGGER before_movie_insert BEFORE INSERT ON movies FOR EACH ROW
 INSERT INTO
-  archived_movies
-SELECT
-  *
-FROM
-  movies
-WHERE
-  release_date < YEAR(CURDATE()) - 20;
+  records (changes)
+VALUES
+  (CONCAT ('Will insert: ', NEW.title));
 
-DELETE FROM movies
-WHERE
-  release_date < YEAR(CURDATE()) - 20;
+CREATE TRIGGER after_movie_insert AFTER INSERT ON movies FOR EACH ROW
+INSERT INTO
+  records (changes)
+VALUES
+  (CONCAT ('Insert completed: ', NEW.title));
 
-END
+CREATE TRIGGER before_movie_update BEFORE
+UPDATE ON movies FOR EACH ROW
+INSERT INTO
+  records (changes)
+VALUES
+  (
+    CONCAT (
+      'Will update title: ',
+      OLD.title,
+      ' -> ',
+      NEW.title
+    )
+  );
+
+CREATE TRIGGER after_movie_update AFTER
+UPDATE ON movies FOR EACH ROW
+INSERT INTO
+  records (changes)
+VALUES
+  (
+    CONCAT (
+      'Update completed: ',
+      OLD.title,
+      ' -> ',
+      NEW.title
+    )
+  );
+
+CREATE TRIGGER before_movie_delete BEFORE DELETE ON movies FOR EACH ROW
+INSERT INTO
+  records (changes)
+VALUES
+  (CONCAT ('Will delete title: ', OLD.title));
+
+CREATE TRIGGER after_movie_delete AFTER DELETE ON movies FOR EACH ROW
+INSERT INTO
+  records (changes)
+VALUES
+  (CONCAT ('Delete completed: ', OLD.title));
