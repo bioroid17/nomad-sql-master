@@ -1,46 +1,37 @@
+CREATE TABLE genres (
+  genre_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  name VARCHAR(50) UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 INSERT INTO
-  users (
-    username,
-    email,
-    gender,
-    interests,
-    bio,
-    age,
-    is_admin,
-    birth_date,
-    bed_time,
-    graduation_year,
-    internship_period
-  )
-VALUES
-  (
-    'nico',
-    'nico@n.com',
-    'male',
-    ARRAY['tech', 'music', 'travel'],
-    'I like eating and traveling',
-    18,
-    True,
-    '1990-01-01',
-    '21:00:00',
-    1993,
-    '2 years 6 months'
-  );
-
-SELECT joined_at FROM users;
-SELECT joined_at::DATE FROM users;
-SELECT joined_at::TIME FROM users;
-
-
-SELECT '1' + '1'; -- 에러
-SELECT '1'::INTEGER + '1'::INTEGER;
-SELECT 'aaaa'::INTEGER + '1'::INTEGER; -- 에러
-
-SELECT
-  joined_at::DATE AS joined_date,
-  EXTRACT(YEAR FROM joined_at) as joined_year,
-  joined_at - INTERVAL '1 day' as day_before_joining,
-  AGE(birth_date) as age,
-  JUSTIFY_INTERVAL(INTERVAL '38493 hours')
+  genres (name)
+SELECT DISTINCT
+  UNNEST(STRING_TO_ARRAY(genres, ','))
 FROM
-  users;
+  movies
+GROUP BY
+  genres;
+
+CREATE TABLE movies_genres (
+  movie_id BIGINT NOT NULL,
+  genre_id BIGINT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  PRIMARY KEY (movie_id, genre_id),
+  FOREIGN KEY (movie_id) REFERENCES movies (movie_id),
+  FOREIGN KEY (genre_id) REFERENCES genres (genre_id)
+);
+
+INSERT INTO
+  movies_genres (movie_id, genre_id)
+SELECT
+  movies.movie_id,
+  genres.genre_id
+FROM
+  movies
+  JOIN genres on movies.genres LIKE '%' || genres.name || '%';
+
+ALTER TABLE movies
+DROP COLUMN genres;
