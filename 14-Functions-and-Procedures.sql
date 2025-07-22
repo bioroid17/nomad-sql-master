@@ -1,30 +1,35 @@
--- 함수 생성
--- OR REPLACE는 필수 아님
 CREATE
-OR REPLACE FUNCTION hello_world () RETURNS TEXT AS $$
-  SELECT 'hello_world';
+OR REPLACE FUNCTION is_hit_or_flop (movie movies) RETURNS TEXT AS $$
+  SELECT
+  CASE
+    WHEN movie.revenue > movie.budget THEN 'Hit'
+    WHEN movie.revenue < movie.budget THEN 'Flop'
+    ELSE 'N/A'
+  END;
 $$ LANGUAGE SQL;
 
 SELECT
-  hello_world();
+  title,
+  is_hit_or_flop(movies.*)
+FROM
+  movies;
 
--- 파라미터 받기
+DROP FUNCTION is_hit_or_flop(movies);
+
+-- 여러 개의 값을 반환하는 함수
 CREATE
-OR REPLACE FUNCTION hello_world (user_name TEXT) RETURNS TEXT AS $$
-  SELECT 'hello ' || user_name;
+OR REPLACE FUNCTION is_hit_or_flop (movie movies) RETURNS TABLE (hit_or_flop TEXT, other_thing NUMERIC) AS $$
+  SELECT
+  CASE
+    WHEN movie.revenue > movie.budget THEN 'Hit'
+    WHEN movie.revenue < movie.budget THEN 'Flop'
+    ELSE 'N/A'
+  END,
+  11111;
 $$ LANGUAGE SQL;
 
--- 함수 삭제
-DROP FUNCTION hello_world ();
-
 SELECT
-  hello_world ('nico');
-
--- 파라미터 이름 없음 -> 타입만 작성
-CREATE
-OR REPLACE FUNCTION hello_world (TEXT, TEXT) RETURNS TEXT AS $$
-  SELECT 'hello ' || $1 || ' and ' || $2; -- 파라미터 순서로 값에 접근
-$$ LANGUAGE SQL;
-
-SELECT
-  hello_world ('nico', 'lynn');
+  title,
+  (is_hit_or_flop(movies.*)).*
+FROM
+  movies;
