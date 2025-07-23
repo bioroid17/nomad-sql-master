@@ -1,43 +1,24 @@
--- return 하지 않는 프로시저
-CREATE PROCEDURE set_zero_revenue () AS $$
-  UPDATE movies SET revenue = NULL WHERE revenue = 0;
-$$ LANGUAGE SQL;
+CREATE EXTENSION plpython3u;
 
-CALL set_zero_revenue ();
+CREATE
+OR REPLACE FUNCTION hello_world_py (name TEXT) RETURNS TEXT AS $$
+  def hello(name):
+    return f'hello {name}'
+  output = hello(name)
+  return output
+$$ LANGUAGE plpython3u;
 
--- return 하는 프로시저
-CREATE PROCEDURE hello_world_p (IN name TEXT, OUT greeting TEXT) AS $$
-  BEGIN
-    greeting = 'Hello ' || name;
-  END;
-$$ LANGUAGE PLPGSQL;
-
--- CALL hello_world_p ('nico'); <- 에러
-CALL hello_world_p ('nico', NULL); -- 출력값에 해당하는 인자도 줘야 한다.
-
--- PLPGSQL 맛보기
--- 유저의 언어에 따라 여러 언어로 인사하는 함수 만들기
-CREATE PROCEDURE hello_world_i (IN name TEXT, IN lang TEXT, OUT greeting TEXT) AS $$
-  DECLARE
-    spanish_hello TEXT = 'hola';
-    italian_hello TEXT = 'ciao';
-    korean_hello TEXT = '안녕';
-  BEGIN
-    IF lang = 'korean' THEN
-      greeting := korean_hello || ' ' || name || '!';
-    ELSIF lang = 'italian' THEN
-      greeting := italian_hello || ' ' || name || '!';
-    ELSIF lang = 'spanish' THEN
-      greeting := spanish_hello || ' ' || name || '!';
-    ELSE
-      greeting := 'hello ' || name || '!';
-    END IF;
-  END;
-$$ LANGUAGE PLPGSQL;
+SELECT
+  hello_world_py ('nico');
 
 
+CREATE
+OR REPLACE FUNCTION log_updated_at_py () RETURNS TRIGGER AS $$
+  import json, requests
+  
+  requests.post('http://localhost:3000', data=json.dumps(TD))
+$$ LANGUAGE plpython3u;
 
-CALL hello_world_i('nico', 'korean', NULL);
-CALL hello_world_i('nico', 'italian', NULL);
-CALL hello_world_i('nico', 'spanish', NULL);
-CALL hello_world_i('nico', 'esperanto', NULL);
+CREATE TRIGGER updated_at_py BEFORE
+UPDATE ON movies FOR EACH ROW
+EXECUTE PROCEDURE log_updated_at_py ();
