@@ -36,3 +36,5 @@ WHERE
   account_holder = 'nico';
 
 COMMIT; -- 트랜잭션 종료 시 실행
+
+ROLLBACK; -- 트랜잭션 변경사항 폐기 시 실행
