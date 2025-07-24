@@ -24,6 +24,8 @@ SET
 WHERE
   account_holder = 'lynn';
 
+SAVEPOINT transfer_one;
+
 SELECT
   *
 FROM
@@ -31,9 +33,11 @@ FROM
 
 UPDATE accounts
 SET
-  balance = balance - 1500
+  account_holder = 'rich lynn'
 WHERE
-  account_holder = 'nico';
+  account_holder = 'lynn';
+
+ROLLBACK TO SAVEPOINT transfer_one;
 
 COMMIT; -- 트랜잭션 종료 시 실행
 
