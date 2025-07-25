@@ -1,8 +1,11 @@
+-- MySQL 연결에서 작성됨
+
 CREATE TABLE accounts (
-  account_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  account_id BIGINT PRIMARY KEY AUTO_INCREMENT,
   account_holder VARCHAR(100) NOT NULL,
   balance DECIMAL(10, 2) NOT NULL CHECK (balance >= 0)
 );
+
 DROP TABLE accounts;
 
 INSERT INTO
@@ -11,12 +14,8 @@ VALUES
   ('nico', 1000.00),
   ('lynn', 2000.00);
 
-SELECT
-  *
-FROM
-  accounts;
-
-BEGIN; -- 트랜잭션 시작 시 실행
+-- 트랜잭션 A
+START TRANSACTION;
 
 UPDATE accounts
 SET
@@ -24,21 +23,26 @@ SET
 WHERE
   account_holder = 'lynn';
 
-SAVEPOINT transfer_one;
-
 SELECT
   *
 FROM
   accounts;
 
-UPDATE accounts
+ROLLBACK;
+
+COMMIT;
+
+
+-- 트랜잭션 B
 SET
-  account_holder = 'rich lynn'
-WHERE
-  account_holder = 'lynn';
+  SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
 
-ROLLBACK TO SAVEPOINT transfer_one;
+START TRANSACTION;
 
-COMMIT; -- 트랜잭션 종료 시 실행
+-- do stuff
+SELECT
+  *
+FROM
+  accounts;
 
-ROLLBACK; -- 트랜잭션 변경사항 폐기 시 실행
+COMMIT;
