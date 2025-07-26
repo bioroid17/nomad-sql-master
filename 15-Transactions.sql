@@ -19,7 +19,7 @@ BEGIN;
 
 UPDATE accounts
 SET
-  balance = balance + 1500
+  balance = balance + 200
 WHERE
   account_holder = 'lynn';
 
@@ -35,9 +35,16 @@ COMMIT;
 
 -- 트랜잭션 B
 BEGIN;
+
 SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 
 -- do stuff
+UPDATE accounts
+SET
+  balance = balance - 100
+WHERE
+  account_holder = 'lynn';
+
 SELECT
   *
 FROM
