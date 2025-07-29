@@ -1,24 +1,17 @@
-CREATE EXTENSION pgcrypto;
+CREATE EXTENSION "uuid-ossp";
 
-CREATE TABLE users3 (
-  user_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+CREATE TABLE users4 (
+  user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username VARCHAR(100),
   password VARCHAR(100)
 );
 
--- 비밀번호를 암호화해서 저장
--- crypt(): 해시 함수
--- gen_salt(): 해시 알고리즘 선택 함수
 INSERT INTO
-  users3 (username, password)
+  users4 (username, password)
 VALUES
-  ('nico', crypt ('user_password', gen_salt ('bf')));
+  ('nico', '1234');
 
--- 암호화된 비밀번호를 인증하는 방법
 SELECT
-  username
+  *
 FROM
-  users3
-WHERE
-  username = 'nico'
-  AND password = crypt ('user_password', password);
+  users4;
