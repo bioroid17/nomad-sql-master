@@ -42,7 +42,26 @@ def s_change_password(username, new_password):
     )
 
 
-s_change_password("nico", "hacked again' --")
+data = [
+    ("lannna", 567),
+    ("bora", 123),
+    ("max", 123),
+    ("jja", 898),
+]
+
+# cur.executemany("INSERT INTO users (username, password) VALUES (?, ?)", data)
+
+data = [
+    {"name": "lannna", "password": 567},
+    {"name": "bora", "password": 123},
+    {"name": "max", "password": 123},
+    {"name": "jja", "password": 898},
+]
+
+cur.executemany(
+    "INSERT INTO users (username, password) VALUES (:name, :password)",
+    data,
+)
 
 print_all_users()
 
