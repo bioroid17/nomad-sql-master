@@ -1,18 +1,27 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { movies } from "./drizzle/schema";
+import { comments, users } from "./schema";
+import { eq } from "drizzle-orm";
 
-const sqlite = new Database("../movies_download.db");
+const sqlite = new Database("users.db");
 
-const db = drizzle(sqlite);
+const db = drizzle(sqlite, { logger: true });
 
-const results = await db
+// const result = await db.insert(users).values({ username: "nico" }).returning();
+
+// const result = await db
+//   .insert(comments)
+//   .values({ payload: "Hello drizzel", userId: 1 })
+//   .returning();
+
+// const result = await db.select().from(comments).where(eq(comments.userId, 1));
+
+const result = await db
   .select({
-    id: movies.movieId,
-    title: movies.title,
-    overview: movies.overview,
+    user: users.username,
+    comment: comments.payload,
   })
-  .from(movies)
-  .limit(50);
+  .from(comments)
+  .leftJoin(users, eq(comments.userId, users.userId));
 
-console.log(results);
+console.log(result);
