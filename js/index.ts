@@ -1,27 +1,18 @@
-import { Database } from "bun:sqlite";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { comments, users } from "./schema";
-import { eq } from "drizzle-orm";
+import { createClient } from "redis";
 
-const sqlite = new Database("users.db");
+const client = createClient();
 
-const db = drizzle(sqlite, { logger: true });
+await client.connect();
 
-// const result = await db.insert(users).values({ username: "nico" }).returning();
+await client.flushAll();
 
-// const result = await db
-//   .insert(comments)
-//   .values({ payload: "Hello drizzel", userId: 1 })
-//   .returning();
+// await client.set("hello", "world");
 
-// const result = await db.select().from(comments).where(eq(comments.userId, 1));
+// const result = await client.get("hello");
 
-const result = await db
-  .select({
-    user: users.username,
-    comment: comments.payload,
-  })
-  .from(comments)
-  .leftJoin(users, eq(comments.userId, users.userId));
+await client.hSet("users:1", { username: "nico", password: "1234" });
 
+const result = await client.hGetAll("users:1");
 console.log(result);
+
+await client.disconnect();
