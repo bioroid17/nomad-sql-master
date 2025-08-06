@@ -1,18 +1,32 @@
-import { createClient } from "redis";
+import * as mongoose from "mongoose";
 
-const client = createClient();
+await mongoose.connect("mongodb://localhost:27017/movies", {});
 
-await client.connect();
+const moviesSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  director: { type: String, required: true },
+  rating: {
+    type: Number,
+    required: true,
+    min: [1, "No movie deserves less than 1"],
+    max: [10, "No movie is better than 10"],
+  },
+});
 
-await client.flushAll();
+const Movie = mongoose.model("Movie", moviesSchema);
 
-// await client.set("hello", "world");
+// const movie = await Movie.create({
+//   title: "Mongoose",
+//   rating: 10,
+// });
+// console.log(movie);
 
-// const result = await client.get("hello");
+// const movies = await Movie.find({});
 
-await client.hSet("users:1", { username: "nico", password: "1234" });
+// const movies = await Movie.find({ director: "Christopher Nolan" });
 
-const result = await client.hGetAll("users:1");
-console.log(result);
+const movies = await Movie.find({ rating: { $gte: 8.2 } });
 
-await client.disconnect();
+console.log(movies);
+
+await mongoose.disconnect();
